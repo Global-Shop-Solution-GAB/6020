@@ -1,0 +1,391 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.frmMain..Create(DashForm)
+Gui.frmMain..Size(1145,776)
+Gui.frmMain..MinX(1016)
+Gui.frmMain..MinY(696)
+Gui.frmMain..Position(0,0)
+Gui.frmMain..BackColor(-2147483633)
+Gui.frmMain..MousePointer(0)
+Gui.frmMain..Event(UnLoad,frmMain_UnLoad)
+Gui.frmMain..Caption("Closed WO Operations by Date")
+Gui.frmMain..AlwaysOnTop(False)
+Gui.frmMain..FontName("Tahoma")
+Gui.frmMain..FontSize(8.25)
+Gui.frmMain..ControlBox(True)
+Gui.frmMain..MaxButton(True)
+Gui.frmMain..MinButton(True)
+Gui.frmMain..Moveable(True)
+Gui.frmMain..Sizeable(True)
+Gui.frmMain..ShowInTaskBar(True)
+Gui.frmMain..TitleBar(True)
+Gui.frmMain..BarExportButton(True)
+Gui.frmMain..BarRefreshButton(True)
+Gui.frmMain..BarSearchBox(False)
+Gui.frmMain..Event(ExportClick,frmMain_ExportClick)
+Gui.frmMain..Event(RefreshClick,frmMain_RefreshClick)
+Gui.frmMain..BarAddButton("ResetGridLayout","Reset Grid Layout",V.Enum.Image!LAYOUT_RESET_COLOR)
+Gui.frmMain..BarAddButton("SaveGridLayout","Save Grid Layout",V.Enum.Image!LAYOUT_SAVE_COLOR)
+Gui.frmMain..Event(UserButtonClicked,frmMain_UserButtonClicked)
+Gui.frmMain.GsGCData.Create(GsGridControl)
+Gui.frmMain.GsGCData.Enabled(True)
+Gui.frmMain.GsGCData.Visible(True)
+Gui.frmMain.GsGCData.Zorder(0)
+Gui.frmMain.GsGCData.Size(1145,671)
+Gui.frmMain.GsGCData.Position(0,39)
+Gui.frmMain.GsGCData.Dock(0)
+Gui.frmMain.GsGCData.Anchor(15)
+Gui.frmMain.GsGCData.Event(RowCellClick,GsGCData_RowCellClick)
+Gui.frmMain.GsGCData.Event(CellValueChanged,frmMain_CellValueChange)
+Gui.frmMain.lblstartdate.Create(Label,"Start Date",True,50,13,0,18,-1,True,0,"Tahoma",8.25,,0,0)
+Gui.frmMain.lblstartdate.BorderStyle(0)
+Gui.frmMain.lblenddate.Create(Label,"End Date",True,44,13,0,134,0,True,0,"Tahoma",8.25,,0,0)
+Gui.frmMain.lblenddate.BorderStyle(0)
+Gui.frmMain.dtpbegdate.Create(DatePicker)
+Gui.frmMain.dtpbegdate.Enabled(True)
+Gui.frmMain.dtpbegdate.Visible(True)
+Gui.frmMain.dtpbegdate.Zorder(0)
+Gui.frmMain.dtpbegdate.Size(100,20)
+Gui.frmMain.dtpbegdate.Position(16,14)
+Gui.frmMain.dtpbegdate.CheckBox(False)
+Gui.frmMain.dtpbegdate.FontName("Tahoma")
+Gui.frmMain.dtpbegdate.FontSize(8.25)
+Gui.frmMain.dtpbegdate.DefaultValue(6/15/202012:00:00AM)
+Gui.frmMain.dtpenddate.Create(DatePicker)
+Gui.frmMain.dtpenddate.Enabled(True)
+Gui.frmMain.dtpenddate.Visible(True)
+Gui.frmMain.dtpenddate.Zorder(0)
+Gui.frmMain.dtpenddate.Size(100,20)
+Gui.frmMain.dtpenddate.Position(133,14)
+Gui.frmMain.dtpenddate.CheckBox(False)
+Gui.frmMain.dtpenddate.FontName("Tahoma")
+Gui.frmMain.dtpenddate.FontSize(8.25)
+Gui.frmMain.dtpenddate.DefaultValue(6/15/202012:00:00AM)
+Gui.frmMain.cmd1.Create(Button)
+Gui.frmMain.cmd1.Enabled(True)
+Gui.frmMain.cmd1.Visible(True)
+Gui.frmMain.cmd1.Zorder(0)
+Gui.frmMain.cmd1.Size(132,23)
+Gui.frmMain.cmd1.Position(280,11)
+Gui.frmMain.cmd1.Caption("Open Seq Close menu")
+Gui.frmMain.cmd1.FontName("Tahoma")
+Gui.frmMain.cmd1.FontSize(8.25)
+Gui.frmMain.cmd1.DefaultValue("")
+Gui.frmMain.cmd1.Event(MouseClick,Button_CloseOps_Click)
+Program.Sub.ScreenSU.End
+Program.Sub.Preflight.Start
+V.Global.sGridViews.Declare
+	V.Global.sSQL.Declare
+
+
+
+Program.External.Include.Library("Gridview_UniversalFunctions.lib",False)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'by Josh Withrow
+'If something breaks, contact Paul.
+
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+
+'*************************************************************************************************
+'************* Start Dashboard Template Stuff
+
+'REQUIRED/OPTIONAL...
+'Set main form title here.  Could be handled in the forms designer, too...
+'If you set this in the forms designer, make sure this line is commented.
+'Gui.frmMain..Caption("Gridview Template")
+
+'REQUIRED...
+'Set list of controls (grids) that should have their preferences saved.  You know, so they grids load the same way the user left them.
+'FORMNAME*!*CONTROLNAME*!*GRIDVIEWNAME#$#form*!*gsgridcontrol*!*gridview#$#etc*!*etc*!*etc
+'Wash/rinse/repeat for each gridview that you want to store.
+'If there is only one gridview to maintain, only supply the single reference.
+V.Global.sGridViews.Set("frmMain*!*GsGCData*!*gvData")
+'V.Global.sGridViews.Set("frmMain*!*GsGCWindMachines*!*gvWindMachines#$#frmMain*!*GsGCShakers*!*gvShakers")
+
+'IGNORE...
+'Set ARC ID
+'Grabs the ARCID from the filename for use with saving/restoring grid preferences.  So make sure you stick with the file naming convention!
+'Typical file naming convention: DDD_IIII_Description.g2u
+'DDD=Department (GCG, ATG, GAB, etc.)
+'IIII=Reserved ARC ID (5849, 1234, whatever)
+'Description=Short Description of Project
+'Example: GCG_5849_UltimateDashboard.g2u
+F.Intrinsic.Control.CallSub(SetARCID)
+
+'Open DB Connection
+F.ODBC.Connection!con.OpenCompanyConnection(500)
+
+'************* End Dashboard Template Stuff
+'*************************************************************************************************
+
+'Everything beyond this point isn't tied to the "template", but is project specific programming.
+
+'Make the main form visible
+Gui.frmMain..Visible(True)
+
+'Set SQL query to load data into the grid...
+'SQL Query...  drives everything!
+'A column alias of @Part, @SO, @PO, @WO (just empty column with that heading) will produce a document control link to that entity, and when clicked will launch document control to that item.  
+'A column alias of Part, SO, PO, or WO produce a blue text hyperlink column that, when clicked, lauches S&D, SO View, PO View, or WO View respectively to that entity.  
+'No programming.  Just dropping the appropriate columns into your query(s).
+'
+'Some ground rules...
+'Any PART column that you want to be a link must be aliased to PART, and it must be fully trimmed (no whitespace on either side).  
+' -- Also, LOCATION must be in the query (even if it's not on-screen), too, and must be aliased to LOCATION, LOCN, or LOC.  As long as the column exists 
+'Any SALES ORDER number field that you want to be a link must be aliased to SO
+'Any PURCHASE ORDER number field that you want to be a link must be aliased to PO
+'Any WORK ORDER number field that you want to be a link must have JOB and SUFFIX concatenated together with a hyphen between them. must be aliased to WO
+' -- CASE WHEN SUFFIX='' THEN JOB ELSE JOB+'-'+SUFFIX END AS WO
+'
+'V.Global.sSQL.Set("select '' '@PART', Ltrim(Rtrim(PART)) PART, LOCATION, PRODUCT_LINE, DESCRIPTION from V_INVENTORY_ALL order by PART, LOCATION")
+f.Intrinsic.String.Build("select CASE WHEN A.SUFFIX='' THEN A.JOB ELSE A.JOB+'-'+A.SUFFIX END AS WO,'Sup Job Maint' AS '^WO SUP',A.SEQ,A.LMO,A.WORKCENTER,A.DESCRIPTION,CASE WHEN A.LMO = 'L' THEN A.UNITS_OPEN ELSE A.HOURS_ESTIMATED END AS 'ESTIMATED QUANTITY',CASE WHEN A.LMO = 'L' THEN A.UNITS_COMPLETE ELSE A.HOURS_ACTUAL END AS 'COMPLETED QUANTITY',CASE WHEN A.LMO = 'L' THEN (A.UNITS_OPEN - A.UNITS_COMPLETE) ELSE (A.HOURS_ESTIMATED - A.HOURS_ACTUAL) END AS 'QTY BALANCE',A.DATE_COMPLETED AS 'DATE COMPLETED',A.JOB,A.SUFFIX,N.NOTES from V_JOB_OPERATIONS_WC A LEFT OUTER JOIN V_JOB_HEADER B ON A.JOB=B.JOB AND A.SUFFIX=B.SUFFIX LEFT OUTER JOIN GCG_6020_NOTES N ON A.JOB=N.JOB AND A.SUFFIX=N.SUFFIX AND A.SEQ=N.SEQ WHERE A.DATE_COMPLETED >= '{0}' AND A.DATE_COMPLETED <= '{1}' AND A.DATE_COMPLETED <> '1900-01-01' AND B.DATE_CLOSED = '1900-01-01' AND LMO in ('L','M','O') order by A.DATE_COMPLETED,WO",V.Screen.frmMain!dtpbegdate.Value.pervasivedate,V.Screen.frmMain!dtpenddate.Value.pervasivedate,v.Global.sSQL)
+
+'set date fields for form to prior day
+v.Local.dcutdt.Declare(Date)
+F.Intrinsic.Date.DateAdd("D",-1,V.Ambient.Date,V.Local.dCutDt)
+gui.frmMain.dtpbegdate.Value(v.Local.dcutdt)
+gui.frmMain.dtpenddate.Value(v.Local.dcutdt)
+F.Intrinsic.Control.CallSub(CHECK_TABLE)
+F.Intrinsic.Control.CallSub(DataLoader)
+
+'load grid preferences
+'technically template stuff.
+
+F.Intrinsic.Control.CallSub(Deserialize)
+Program.Sub.Main.End
+
+Program.Sub.frmMain_UnLoad.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+		
+		F.Intrinsic.Control.CallSub(Serialize)
+		F.ODBC.Connection!con.Close
+		F.Intrinsic.Control.End
+		
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.Control.CallSub(Catching,"Sub",V.Ambient.CurrentSubroutine,"ErrorNo",V.Ambient.ErrorNumber,"ErrorDesc",V.Ambient.ErrorDescription) 
+	F.Intrinsic.Control.EndTry
+Program.Sub.frmMain_UnLoad.End
+
+Program.Sub.frmMain_ExportClick.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+		
+		F.Intrinsic.Control.CallSub(ExportGrid,"sGridControls","frmMain*!*GsGCData")
+		
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.Control.CallSub(Catching,"Sub",V.Ambient.CurrentSubroutine,"ErrorNo",V.Ambient.ErrorNumber,"ErrorDesc",V.Ambient.ErrorDescription) 
+	F.Intrinsic.Control.EndTry
+Program.Sub.frmMain_ExportClick.End
+
+Program.Sub.frmMain_RefreshClick.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+		
+		F.Intrinsic.Control.CallSub(Serialize)
+		F.Intrinsic.Control.CallSub(DataLoader)
+		F.Intrinsic.Control.CallSub(Deserialize)
+		
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.Control.CallSub(Catching,"Sub",V.Ambient.CurrentSubroutine,"ErrorNo",V.Ambient.ErrorNumber,"ErrorDesc",V.Ambient.ErrorDescription) 
+	F.Intrinsic.Control.EndTry
+Program.Sub.frmMain_RefreshClick.End
+
+Program.Sub.frmMain_UserButtonClicked.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+		
+		'V.ARGS.BUTTON: ButtonName of the button clicked (not the text/caption, but the control name)...
+		'From ScreenSU...
+		'                           ButtonName
+		'                           \/
+		'Gui.frmMain..BarAddButton("ResetColumns","Reset Columns",V.Enum.Image!LAYOUT_RESET_COLOR)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.Button)
+			
+			F.Intrinsic.Control.Case("ResetGridLayout")
+				F.Intrinsic.Control.CallSub(ResetGrid,"sGridViewName","GVData")
+				F.Intrinsic.Control.CallSub(LoadData, "sDataTableName","dtData","sFormName","frmMain","sGridControlName","GsGCData","sGridViewName","gvData","sSQL",V.Global.sSQL)
+				F.Intrinsic.Control.CallSub(Deserialize)
+				
+			F.Intrinsic.Control.Case("SaveGridLayout")
+				F.Intrinsic.Control.CallSub(Serialize)
+				
+		F.Intrinsic.Control.EndSelect
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.Control.CallSub(Catching,"Sub",V.Ambient.CurrentSubroutine,"ErrorNo",V.Ambient.ErrorNumber,"ErrorDesc",V.Ambient.ErrorDescription) 
+	F.Intrinsic.Control.EndTry
+Program.Sub.frmMain_UserButtonClicked.End
+Program.Sub.DataLoader.Start
+	'Get data and load into grid(s)
+	'                                                                           Name of form where GridControl lives                     Name of Gridview (usually just the same name as GridControl or DataTable, but with gv prefix)
+	'                                                                           |                                                        |
+	'                                                      Name of DataTable    |                             Name of GridControl to load data into      Basis (SQL query) to load into the grid                                                        If you want to include/wrap the suspend layout in this call, set to TRUE.  Or, if you want to set it manually around it, set it to False.
+	'                                                      \/                   \/                            \/                         \/              \/                                                                                             \/                
+	'F.Intrinsic.Control.CallSub(LoadData,"sDataTableName","dtData","sFormName","frmMain","sGridControlName","GsGCData","sGridViewName","gvData","sSQL","select PART, LOCATION, PRODUCT_LINE, DESCRIPTION from V_INVENTORY_ALL order by PART, LOCATION","bSuspendLayout",True)
+	
+	'Set SQL query to load data into the grid...
+	'SQL Query...  drives everything!
+	'A column alias of @Part, @SO, @PO, @WO (just empty column with that heading) will produce a document control link to that entity, and when clicked will launch document control to that item.  
+	'A column alias of Part, SO, PO, or WO produce a blue text hyperlink column that, when clicked, lauches S&D, SO View, PO View, or WO View respectively to that entity.  
+	'No programming.  Just dropping the appropriate columns into your query(s).
+	'
+	'Some ground rules...
+	'Any PART column that you want to be a link must be aliased to PART, and it must be fully trimmed (no whitespace on either side).  
+	' -- Also, LOCATION must be in the query (even if it's not on-screen), too, and must be named LOCATION, LOCN, or LOC.
+	'Any SALES ORDER number field that you want to be a link must be aliased to SO
+	'Any PURCHASE ORDER number field that you want to be a link must be aliased to PO
+	'Any WORK ORDER number field that you want to be a link must have JOB and SUFFIX concatenated together with a hyphen between them. must be aliased to WO
+	' -- CASE WHEN SUFFIX='' THEN JOB ELSE JOB+'-'+SUFFIX END AS WO
+	'
+	'rebuild SQL statement based on beg and end dates from form
+	f.Intrinsic.String.Build("select CASE WHEN A.SUFFIX='' THEN A.JOB ELSE A.JOB+'-'+A.SUFFIX END AS WO,'Sup Job Maint' AS '^WO SUP',A.SEQ,A.LMO,A.WORKCENTER,A.DESCRIPTION,CASE WHEN A.LMO = 'L' THEN A.UNITS_OPEN ELSE A.HOURS_ESTIMATED END AS 'ESTIMATED QUANTITY',CASE WHEN A.LMO = 'L' THEN A.UNITS_COMPLETE ELSE A.HOURS_ACTUAL END AS 'COMPLETED QUANTITY',CASE WHEN A.LMO = 'L' THEN (A.UNITS_OPEN - A.UNITS_COMPLETE) ELSE (A.HOURS_ESTIMATED - A.HOURS_ACTUAL) END AS 'QTY BALANCE',A.DATE_COMPLETED AS 'DATE COMPLETED',A.JOB,A.SUFFIX,N.NOTES from V_JOB_OPERATIONS_WC A LEFT OUTER JOIN V_JOB_HEADER B ON A.JOB=B.JOB AND A.SUFFIX=B.SUFFIX LEFT OUTER JOIN GCG_6020_NOTES N ON A.JOB=N.JOB AND A.SUFFIX=N.SUFFIX AND A.SEQ=N.SEQ WHERE A.DATE_COMPLETED >= '{0}' AND A.DATE_COMPLETED <= '{1}' AND A.DATE_COMPLETED <> '1900-01-01' AND B.DATE_CLOSED = '1900-01-01' AND LMO in ('L','M','O') order by A.DATE_COMPLETED,WO",V.Screen.frmMain!dtpbegdate.Value.pervasivedate,V.Screen.frmMain!dtpenddate.Value.pervasivedate,v.Global.sSQL)
+	F.Intrinsic.Control.CallSub(LoadData, "sDataTableName","dtData","sFormName","frmMain","sGridControlName","GsGCData","sGridViewName","gvData","sSQL",V.Global.sSQL,"bSuspendLayout",True)
+	
+	'Additional Grid Formatting Options...  and anything else that you need to tack onto the project revolving around the grid.
+	'Gui.frmMain.GsGCData.SetGridviewProperty("gvData","EXPANDALLGROUPS",True)
+	'Gui.frmMain.GsGCData.SetColumnProperty("gvData","WORKCENTER","GROUPINDEX",0) 
+	'Gui.frmMain.GsGCData.SetColumnProperty("gvData","PULLED","CellBackColor","LightYellow")
+	'Gui.frmMain.GsGCData.SetColumnProperty("gvData","EST_HRS","DisplayCustomNumeric","#,###,###,##0.00")
+	'Gui.frmMain.GsGCData.SetColumnProperty("gvData","DATE_START","DisplayCustomDatetime","d")
+	'Gui.frmMain.GsGCData.AddSummaryItem("gvData","SEQ_ACT_HRS","SUM_SEQ_ACT_HRS","Sum","","","n")	
+	'Hide columns
+	Gui.frmMain.GsGCData.SetColumnProperty("gvData","JOB","Visible",False)
+	Gui.frmMain.GsGCData.SetColumnProperty("gvData","SUFFIX","Visible",False)
+		
+	'Set column color based on completed qty < estimated qty
+	gui.frmMain.GsGCData.AddStyleFormatCondition("gvdata","qty balance","tagbalgvdata","notequal",0)
+	gui.frmMain.GsGCData.SetStyleFormatConditionProperty("gvdata","qty balance","tagbalgvdata","backcolor","Orange")
+
+	Gui.frmMain.GsGCData.SetGridviewProperty("gvData","OptionBehaviorEditable",True)
+	Gui.frmMain.GsGCData.SetGridviewProperty("gvData","ReadOnly",False)	
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","Notes","CellBackColor","lightyellow")
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","Notes","Allowedit",True)
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","Notes","Readonly",False)
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","WO","Readonly",True)
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","WO","Allowedit",False)
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","^WO SUP","Readonly",True)
+	gui.frmMain.GsGCData.SetColumnProperty("gvdata","^WO SUP","Allowedit",False)
+	
+	
+Program.Sub.DataLoader.End
+
+Program.Sub.GsGCData_RowCellClick.Start
+	'V.Args.Screen: FRMMAIN
+	'V.Args.ControlName:GSGCDATA0
+	'V.Args.EventType: ROWCELLCLICK
+	'V.Args.Column: @Part
+	'V.Args.RowIndex: 0
+	v.Local.iRet.Declare(boolean)
+	v.Local.sFile.Declare
+	v.Local.sJob.Declare
+	v.Local.sSuffix.Declare
+	V.Local.sText.Declare
+	v.Local.bEdit.Declare
+
+	
+	'This sub call will handle all of the basic built in core data entity stuff...
+	'linking to S&D, PO View, SO View, WO View, and DCS Linking
+	'@Part, @SO, @PO, @WO, PART, SO, PO, WO columns all handled in the basic sense.
+	F.Intrinsic.Control.CallSub(GetActiveGridView,"ControlName",V.Args.ControlName)
+	F.Intrinsic.Control.CallSub(RowCellClick_HandleCoreEntity, "Screen", V.Args.Screen, "ControlName", V.Args.ControlName, "EventType", V.Args.EventType, "Column", V.Args.Column, "RowIndex", V.Args.RowIndex, "GridView", V.Args.GridView)
+	
+	'Handle anything not handled...
+	F.Intrinsic.Control.SelectCase(V.Args.Column.UCase)
+		'launch supervisor job maintenance					
+		F.Intrinsic.Control.Case("^WO SUP")
+		'first check user permissions to Shop Floor Control > Administration > Supervisor Job Maintenance > Open
+		Function.Global.Security.CheckUserAccessIPM(532,1,v.Local.bEdit)					
+		f.Intrinsic.Control.If(v.Local.bEdit)
+			F.Intrinsic.String.Concat(V.Caller.FilesDir,"\SJM",v.Caller.CompanyCode,V.Caller.Terminal,".txt",V.Local.sFile)
+			Gui.frmMain.GsGCData.GetCellValueByColumnName("gvData","JOB",v.Args.RowIndex,v.Local.sJob)
+			Gui.frmMain.GsGCData.GetCellValueByColumnName("gvData","SUFFIX",v.Args.RowIndex,v.Local.sSuffix)
+			F.Intrinsic.String.Concat(V.Local.sJob,"*!*",V.Local.sSuffix,V.Local.sText)
+			F.Intrinsic.File.String2File(V.Local.sFile,V.Local.sText)
+			F.Global.General.LaunchMenuTask(532,1,V.Local.iRet)
+		f.Intrinsic.Control.EndIf
+		
+	'		'Do GNARLY STUFF!
+	F.Intrinsic.Control.EndSelect
+Program.Sub.GsGCData_RowCellClick.End
+
+Program.Sub.Button_CloseOps_Click.Start
+v.Local.bEdit.Declare
+v.Local.iRet.Declare(boolean)
+'first check user permissions to Shop Floor Control > Administration > Add/Delete Operation Closed Date
+		Function.Global.Security.CheckUserAccessIPM(611,0,v.Local.bEdit)					
+		f.Intrinsic.Control.If(v.Local.bEdit)			
+			F.Global.General.LaunchMenuTask(611,0,V.Local.iRet)
+		f.Intrinsic.Control.EndIf
+Program.Sub.Button_CloseOps_Click.End
+
+Program.Sub.Check_table.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+' This subroutine will check to see if GCG_6020_notes exists and will create it if it doesn't
+
+V.Local.bExists.Declare
+V.Local.sSQL.Declare
+F.ODBC.Connection!Con.TableExists("GCG_6020_Notes",V.Local.bExists)
+
+' Create the table if it doesn't exist
+F.Intrinsic.Control.If(V.Local.bExists,=,False)
+	' Build the create statement
+	F.ODBC.Connection!con.Execute("CREATE TABLE GCG_6020_Notes(JOB CHAR(6)  ,SUFFIX CHAR(3),SEQ CHAR(6)  ,NOTES LONGVARCHAR);")
+	F.ODBC.Connection!con.Execute("CREATE UNIQUE INDEX INDEX0 USING 0 ON GCG_6020_Notes ( JOB, SUFFIX, SEQ );")
+
+F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Catching,"Sub",V.Ambient.CurrentSubroutine,"ErrorNo",V.Ambient.ErrorNumber,"ErrorDesc",V.Ambient.ErrorDescription) 
+	F.Intrinsic.Control.EndTry
+Program.Sub.Check_table.End
+
+Program.Sub.frmMain_CellValueChange.Start
+	'V.Args.Screen: FRMMAIN
+	'V.Args.ControlName:GSGCDATA0
+	'V.Args.EventType: ROWCELLCLICK
+	'V.Args.Column: @Part
+	'V.Args.RowIndex: 0
+	v.Local.iRet.Declare(boolean)
+	v.Local.sFile.Declare
+	v.Local.sJob.Declare
+	v.Local.sSuffix.Declare
+	V.Local.sSeq.Declare
+	V.Local.sText.Declare
+	v.Local.bEdit.Declare
+	v.Local.sSQL.Declare
+	v.Local.sNotes.Declare
+	
+	'This sub call will handle all of the basic built in core data entity stuff...
+	'linking to S&D, PO View, SO View, WO View, and DCS Linking
+	'@Part, @SO, @PO, @WO, PART, SO, PO, WO columns all handled in the basic sense.
+	F.Intrinsic.Control.CallSub(GetActiveGridView,"ControlName",V.Args.ControlName)
+	F.Intrinsic.Control.CallSub(RowCellClick_HandleCoreEntity, "Screen", V.Args.Screen, "ControlName", V.Args.ControlName, "EventType", V.Args.EventType, "Column", V.Args.Column, "RowIndex", V.Args.RowIndex, "GridView", V.Args.GridView)
+	
+	'Handle anything not handled...
+	F.Intrinsic.Control.SelectCase(V.Args.Column.UCase)		
+		F.Intrinsic.Control.CaseAny("NOTES","Notes")
+			Gui.frmMain.GsGCData.GetCellValueByColumnName("gvData","JOB",v.Args.RowIndex,v.Local.sJob)
+			Gui.frmMain.GsGCData.GetCellValueByColumnName("gvData","SUFFIX",v.Args.RowIndex,v.Local.sSuffix)
+			Gui.frmMain.GsGCData.GetCellValueByColumnName("gvData","SEQ",v.Args.RowIndex,v.Local.sSeq)
+			Gui.frmMain.GsGCData.GetCellValueByColumnName("gvData","NOTES",v.Args.RowIndex,v.Local.sNotes)
+			
+			F.Intrinsic.String.Build("SELECT * FROM GCG_6020_NOTES WHERE JOB = '{0}' AND SUFFIX = '{1}' AND SEQ = '{2}';",V.Local.sJob,V.Local.sSuffix,v.Local.sSeq,V.Local.sSQL)
+			F.ODBC.Connection!con.OpenRecordsetRW("rstNotes",V.Local.sSQL)
+			F.Intrinsic.Control.If(V.ODBC.con!rstNotes.EOF,=,True)
+				F.Intrinsic.String.Build("INSERT INTO GCG_6020_NOTES(JOB,SUFFIX,SEQ,NOTES) VALUES('{0}','{1}','{2}','{3}');",V.Local.sJob,V.Local.sSuffix,v.Local.sSeq,V.Local.sNotes,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("UPDATE GCG_6020_NOTES SET NOTES = '{3}' WHERE JOB = '{0}' AND SUFFIX = '{1}' AND SEQ = '{2}';",V.Local.sJob,V.Local.sSuffix,v.Local.sSeq,V.Local.sNotes,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.con!rstNotes.Close
+	F.Intrinsic.Control.EndSelect
+Program.Sub.frmMain_CellValueChange.End
+
+Program.Sub.Comments.Start
+${$5$}$3.0.0.0$}$1
+${$6$}$bstevens$}$20200720143848306$}$3Pg7+K2MGztoXyjxMVZqWaM5g3GOUsSN7lkaytOfewuyXGZLtk9fdKD9pAJ3xNPNKHwGuR1ONBILHBXGiWcE+g==
+Program.Sub.Comments.End
