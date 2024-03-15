@@ -1,0 +1,54 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'Runs off of GUI update jobs process button pre-hook 15880
+'checks job sequence open qty and subtracts good pieces reported on current job update.  If balance <= open qty then set close flag prior to writing to JOBS_IN_PROCESS table
+F.Intrinsic.Control.Try
+
+'open db connection
+F.ODBC.Connection!Con.OpenCompanyConnection
+
+V.Local.sWorkcenter.Declare(String)
+V.Local.bOption.Declare(Boolean, False)
+V.Local.sFilter.Declare(String)
+V.Local.sSQL.Declare(String)
+V.Local.iCounter.Declare(Long)
+v.Local.sjob.declare
+v.Local.ssuff.Declare
+v.Local.sseq.Declare
+v.Local.sGoodQty.Declare
+v.Local.sQtyRemaining.Declare
+v.Local.sOpenQty.Declare
+V.Local.sRet.Declare
+
+v.Local.sjob.Set(v.Passed.009990.Trim)
+v.Local.ssuff.Set(v.Passed.009991.trim)
+v.Local.sseq.Set(v.Passed.009992.trim)
+v.Local.sGoodQty.Set(v.Passed.000001.trim)
+'v.Local.sQtyRemaining.Set(v.Passed.009004.trim)
+F.Intrinsic.String.Build("select UNITS_OPEN-UNITS_COMPLETE AS OPENQTY FROM V_JOB_OPERATIONS WHERE JOB = '{0}' AND SUFFIX = '{1}' AND SEQ = '{2}' AND LMO = 'L' AND SEQ < '995000' AND RTRIM(PART) <> 'ZIND'", V.Local.sjob,V.Local.ssuff,V.Local.sseq,V.Local.sSQL)
+F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSql,V.Local.sRet)
+F.Intrinsic.Control.If(V.Ambient.ExecuteAndReturnEOF)
+	f.ODBC.Connection!con.Close
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndIf
+V.Local.sQtyRemaining.Set(V.Local.sRet)
+f.Intrinsic.Math.Sub(v.Local.sQtyRemaining,v.Local.sGoodQty,v.Local.sOpenQty)
+'close sequence
+f.Intrinsic.Control.If(v.Local.sOpenQty,"<=",0)
+V.Passed.000003.Set("Y")
+f.Intrinsic.Control.EndIf
+f.ODBC.Connection!con.Close
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$3.0.0.0$}$1
+${$6$}$bstevens$}$20200625112242145$}$3Pg7+K2MGztoXyjxMVZqWaM5g3GOUsSN7lkaytOfewtcjlRbpsd1Ay8UqW/AEHIfZvXhVZDTME8aCIOz8vgmLA==
+Program.Sub.Comments.End
