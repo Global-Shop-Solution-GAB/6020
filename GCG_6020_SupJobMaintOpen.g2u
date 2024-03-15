@@ -1,0 +1,36 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+'launch populate hook 16000 for screen Shop Floor Control > Administration > Supervisor Job Maintenance > Open
+'set job and suffix on load
+V.Local.sFile.Declare(String)
+V.Local.sText.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sJob.Declare(String)
+V.Local.sSuffix.Declare(String)
+F.Intrinsic.String.Concat(V.Caller.FilesDir,"\SJM",v.Caller.CompanyCode,V.Caller.Terminal,".txt",V.Local.sFile)
+F.Intrinsic.File.Exists(V.Local.sFile,V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists,=,True)
+	F.Intrinsic.File.File2String(V.Local.sFile,V.Local.sText)
+	F.Intrinsic.String.Split(V.Local.sText,"*!*",V.Local.sText)
+	V.Passed.000035.Set(V.Local.sText(0))
+	V.Passed.000017.Set(V.Local.sText(1))
+	F.Intrinsic.File.DeleteFile(V.Local.sFile)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$3.0.0.0$}$1
+${$6$}$bstevens$}$20200617114158090$}$3Pg7+K2MGztoXyjxMVZqWaM5g3GOUsSN7lkaytOfewvkruKeFnsRTRhCBfHHeU3y0gEw/9aFh/nXkPeJS5vpnQ==
+Program.Sub.Comments.End
